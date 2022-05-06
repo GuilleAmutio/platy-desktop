@@ -10,6 +10,9 @@
     "beforeBuildCommand": "yarn build"
   },
   "tauri": {
+    "pattern": {
+      "use": "brownfield"
+    },
     "bundle": {
       "active": true,
       "targets": "all",
