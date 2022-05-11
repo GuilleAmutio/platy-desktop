@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "rakoon-desktop",
+    "productName": "platy-desktop",
     "version": "0.1.0"
   },
   "tauri": {
@@ -17,7 +17,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "platy",
       "deb": {
         "depends": []
       },
@@ -58,7 +58,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "An interface for rakoon",
+        "title": "An interface to manage containers",
         "width": 800
       }
     ]
