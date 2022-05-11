@@ -1,83 +1,66 @@
 {
+  "$schema": "..\\node_modules/@tauri-apps/cli\\schema.json",
+  "build": {
+    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "yarn start",
+    "devPath": "http://localhost:3000",
+    "distDir": "../build"
+  },
   "package": {
-    "productName": "rekcod-desktop",
+    "productName": "rakoon-desktop",
     "version": "0.1.0"
   },
-  "build": {
-    "distDir": "../dist/rekcod-desktop",
-    "devPath": "http://localhost:4200",
-    "beforeDevCommand": "yarn start",
-    "beforeBuildCommand": "yarn build"
-  },
   "tauri": {
-    "pattern": {
-      "use": "brownfield"
+    "allowlist": {
+      "all": true
     },
     "bundle": {
       "active": true,
-      "targets": "all",
-      "identifier": "com.rekcod.dev",
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
-        "icons/icon.ico" // This is the one for the app, others are just diff sizes
+        "icons/icon.ico"
       ],
-      "resources": [],
-      "externalBin": [],
-      "copyright": "",
-      "category": "DeveloperTool",
-      "shortDescription": "",
+      "identifier": "com.tauri.dev",
       "longDescription": "",
-      "deb": {
-        "depends": []
-      },
       "macOS": {
-        "frameworks": [],
+        "entitlements": null,
         "exceptionDomain": "",
-        "signingIdentity": null,
+        "frameworks": [],
         "providerShortName": null,
-        "entitlements": null
+        "signingIdentity": null
       },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
         "timestampUrl": ""
       }
     },
+    "security": {
+      "csp": null
+    },
     "updater": {
       "active": false
     },
-    "allowlist": {
-      "all": true,
-      "os": {
-        "all": true
-      },
-      "dialog": {
-        "all": true,
-        "open": true,
-        "save": true
-      }
-    },
     "windows": [
       {
-        "title": "",
-        "skipTaskbar": false,
-        "width": 800,
+        "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "fullscreen": false,
-        "decorations": false,
-        "alwaysOnTop": false,
-        "center": false,
-        "fileDropEnabled": true,
-        "focus": true,
-        "transparent": false
+        "title": "An interface for rakoon",
+        "width": 800
       }
-    ],
-    "security": {
-      "csp": null
-    }
+    ]
   }
 }
