@@ -33,7 +33,8 @@ jobs:
         run: yarn install
       - name: Build app
         run: yarn build
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri native binaries
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run tests
