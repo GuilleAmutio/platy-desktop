@@ -1,11 +1,11 @@
 name: Pull request approver
 on:
   repository_dispatch:
-    branches: [ main, development, 'feature/*' ]    
+    branches: [ main, 'feature/*' ]    
   push:
-    branches: [ main, development, 'feature/*' ]
+    branches: [ main, 'feature/*' ]
   pull_request:
-    branches: [ main, development ]
+    branches: [ main ]
     types: [ opened, reopened, edited, synchronize ]
 jobs:
   build-tauri:
