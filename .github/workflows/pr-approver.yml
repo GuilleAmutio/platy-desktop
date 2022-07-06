@@ -33,6 +33,8 @@ jobs:
         run: yarn install
       - name: Build app
         run: yarn build
+      - name: Run linter
+        run: yarn lint
       - name: Build Tauri native binaries
         uses: tauri-apps/tauri-action@v0
         env:
