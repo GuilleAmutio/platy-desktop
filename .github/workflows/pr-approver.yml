@@ -1,6 +1,8 @@
 name: Pull request approver
 on:
   repository_dispatch:
+    branches: [ main, development, 'feature/*' ]    
+  push:
     branches: [ main, development, 'feature/*' ]
   pull_request:
     branches: [ main, development ]
@@ -41,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run tests
         run: yarn test --all
-        
+
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
