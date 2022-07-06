@@ -4,7 +4,7 @@ on:
     branches: [ main, development, 'feature/*' ]
   pull_request:
     branches: [ main, development ]
-    types: [ opened, reopened ]
+    types: [ opened, reopened, edited, synchronize ]
 jobs:
   build-tauri:
     strategy:
