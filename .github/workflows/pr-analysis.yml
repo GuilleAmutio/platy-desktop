@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ macos-latest, ubuntu-latest, windows-latest ]
+        platform: [ windows-latest ]
     runs-on: ${{ matrix.platform }}
     name: Build tauri app
     steps:
@@ -40,6 +40,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sonarcloud:
     name: SonarCloud
+    if: ${{ success() }}
+    needs: build-tauri
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
