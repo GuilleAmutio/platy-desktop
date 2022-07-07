@@ -30,8 +30,8 @@ jobs:
         run: yarn install
       - name: Build app
         run: yarn build
-      # - name: Run linter
-      #   run: yarn lint
+      - name: Run linter
+        run: yarn lint
       - name: Run tests
         run: yarn test --all
       - name: Build Tauri native binaries
