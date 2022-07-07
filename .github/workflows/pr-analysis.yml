@@ -1,4 +1,4 @@
-name: Pull request approver
+name: Pull request analysis
 on:
   repository_dispatch:
     branches: [ main, 'feature/*' ]    
@@ -13,7 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ macos-latest, ubuntu-latest, windows-latest ]
-
     runs-on: ${{ matrix.platform }}
     name: Build tauri app
     steps:
@@ -37,13 +36,12 @@ jobs:
         run: yarn build
       # - name: Run linter
       #   run: yarn lint
+      - name: Run tests
+        run: yarn test --all
       - name: Build Tauri native binaries
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run tests
-        run: yarn test --all
-
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
