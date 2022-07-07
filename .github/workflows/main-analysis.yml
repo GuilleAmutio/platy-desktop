@@ -3,13 +3,15 @@ on:
   push:
     branches: [ main ]
 jobs:
-  sonarcloud:
-    name: SonarCloud
-    runs-on: windows-latest
+  build-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ windows-latest ]
+    runs-on: ${{ matrix.platform }}
+    name: Build tauri app
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Setup node
         uses: actions/setup-node@v1
         with:
@@ -26,10 +28,29 @@ jobs:
         run: yarn lint
       - name: Run tests
         run: yarn test a --coverage
+      - name: Upload coverage report
+        uses: actions/upload-artifact@master
+        with:
+          name: coverage
+          path: coverage/
       - name: Build Tauri native binaries
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  sonarcloud:
+    name: SonarCloud
+    if: ${{ success() }}
+    needs: build-tauri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download coverage report
+        uses: actions/download-artifact@master
+        with:
+          name: coverage
+          path: coverage/
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
