@@ -39,10 +39,10 @@ jobs:
         with:
           name: coverage
           path: coverage/
-      # - name: Build Tauri native binaries
-      #   uses: tauri-apps/tauri-action@v0
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Tauri native binaries
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sonarcloud:
     name: SonarCloud
     if: ${{ success() }}
@@ -57,8 +57,6 @@ jobs:
         with:
           name: coverage
           path: coverage/
-      - name: Debug
-        run: ls
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
