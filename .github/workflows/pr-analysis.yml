@@ -1,9 +1,5 @@
 name: Pull request analysis
 on:
-  repository_dispatch:
-    branches: [ main, 'feature/*' ]    
-  push:
-    branches: [ main, 'feature/*' ]
   pull_request:
     branches: [ main ]
     types: [ opened, reopened, edited, synchronize ]
