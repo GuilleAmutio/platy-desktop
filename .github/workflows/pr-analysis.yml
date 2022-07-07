@@ -32,12 +32,10 @@ jobs:
         run: yarn build
       - name: Run linter
         run: yarn lint
-      - name: Run tests
-        run: yarn test a --coverage
-      - name: Build Tauri native binaries
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Build Tauri native binaries
+      #   uses: tauri-apps/tauri-action@v0
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sonarcloud:
     name: SonarCloud
     if: ${{ success() }}
@@ -47,6 +45,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Run tests
+        run: yarn test a --coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
