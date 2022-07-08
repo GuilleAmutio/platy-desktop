@@ -5,11 +5,7 @@ on:
     types: [ opened, reopened, edited, synchronize ]
 jobs:
   build-tauri:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ windows-latest ]
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-latest
     name: Build tauri app
     steps:
       - uses: actions/checkout@v2
@@ -40,7 +36,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sonarcloud:
     name: SonarCloud
-    if: ${{ success() }}
     needs: build-tauri
     runs-on: ubuntu-latest
     steps:
