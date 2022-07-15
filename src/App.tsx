@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { invoke } from '@tauri-apps/api/tauri'
 
 function App() {
   return (
@@ -18,9 +19,29 @@ function App() {
         >
           Learn React
         </a>
+        <button type="button" onClick={()=>StartContainer()}> Start Container </button>
+        <button type="button" onClick={()=>StopContainer()}> Stop Container </button>
+        <button type="button" onClick={()=>RestartContainer()}> Restart Container </button>
+        <button type="button" onClick={()=>RemoveContainer()}> Remove Container </button>
       </header>
     </div>
   );
+}
+
+function StartContainer() {
+  invoke('start_container');
+}
+
+function StopContainer() {
+  invoke('stop_container');
+}
+
+function RestartContainer() {
+  invoke('restart_container');
+}
+
+function RemoveContainer() {
+  invoke('remove_container');
 }
 
 export default App;

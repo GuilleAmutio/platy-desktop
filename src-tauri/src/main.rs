@@ -3,19 +3,34 @@
   windows_subsystem = "windows"
 )]
 
+use log::{debug, error, log_enabled, info, Level};
 use bollard::container::ListContainersOptions;
 use bollard::Docker;
+use tauri::{Manager};
 use std::default::Default;
 
 mod container;
 
+#[tauri::command(async)]
+async fn app_ready(app_handle: tauri::AppHandle) {
+	let window = app_handle.get_window("main").unwrap();
+
+	window.show().unwrap();
+}
+
+
 #[tokio::main]
 async fn main() {
+  env_logger::init();
+
+  // TODO Connect with Docker Linux daemon using TCP
+  let docker_lin = Docker::connect_with_socket_defaults().unwrap();
+  // let docker_win = Docker::connect_with_socket_defaults().unwrap; //  TODO Connect with Docker Windows daemon
+
   tauri::Builder::default()
     .setup(|app| {
       let _app = app.handle();
-      let docker_lin = Docker::connect_with_socket_defaults().unwrap(); // TODO Connect with Docker Linux daemon using TCP
-      // let docker_win = Docker::connect_with_socket_defaults().unwrap; //  TODO Connect with Docker Windows daemon
+      
       /*
         4 different threads:
           - Events for Linux containers
@@ -38,7 +53,11 @@ async fn main() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
-      container::create_container
+      container::start_container,
+      container::stop_container,
+      container::restart_container,
+      container::remove_container,
+      app_ready
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
