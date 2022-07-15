@@ -23,6 +23,8 @@ function App() {
         <button type="button" onClick={()=>StopContainer()}> Stop Container </button>
         <button type="button" onClick={()=>RestartContainer()}> Restart Container </button>
         <button type="button" onClick={()=>RemoveContainer()}> Remove Container </button>
+        <button type="button" onClick={()=>OpenInBrowser()}> Open in browser </button>
+        <button type="button" onClick={()=>OpenTerminal()}> Open terminal </button> 
       </header>
     </div>
   );
@@ -42,6 +44,14 @@ function RestartContainer() {
 
 function RemoveContainer() {
   invoke('remove_container');
+}
+
+function OpenInBrowser() {
+  invoke('open_in_browser');
+}
+
+function OpenTerminal() {
+  invoke('open_terminal');
 }
 
 export default App;

@@ -57,6 +57,8 @@ async fn main() {
       container::stop_container,
       container::restart_container,
       container::remove_container,
+      container::open_in_browser,
+      container::open_terminal,
       app_ready
     ])
     .run(tauri::generate_context!())
