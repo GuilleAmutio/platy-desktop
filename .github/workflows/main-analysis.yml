@@ -1,0 +1,58 @@
+name: Main branch analysis
+on:   
+  push:
+    branches: [ main ]
+jobs:
+  build-tauri:
+    runs-on: windows-latest
+    name: Build tauri app
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.4.0
+      - name: Install Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Install app dependencies
+        run: yarn install
+      - name: Build app
+        run: yarn build
+      - name: Run linter
+        run: yarn lint
+      - name: Run tests
+        run: yarn test a --coverage
+      - name: Upload coverage report
+        uses: actions/upload-artifact@master
+        with:
+          name: coverage
+          path: coverage/
+      - name: Build Tauri native binaries
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  sonarcloud:
+    name: SonarCloud
+    needs: build-tauri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download coverage report
+        uses: actions/download-artifact@master
+        with:
+          name: coverage
+          path: coverage/
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
