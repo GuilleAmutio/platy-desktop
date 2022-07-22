@@ -30,7 +30,10 @@ fn init_logging() -> Result<(), SetLoggerError> {
   let logfile_path = "logs/outputs.log";
   let logfile_line_pattern = "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {f}:{L} — {m}{n}";
 
-  let stdout = ConsoleAppender::builder().build();
+  let stdout = ConsoleAppender::builder()
+      .encoder(Box::new(PatternEncoder::new(logfile_line_pattern) ))
+      .build();
+      
   let logfile = FileAppender::builder()
       .append(false)
       .encoder(Box::new(PatternEncoder::new(logfile_line_pattern)))
