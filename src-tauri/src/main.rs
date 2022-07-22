@@ -3,14 +3,19 @@
   windows_subsystem = "windows"
 )]
 
-use log::{debug, error, log_enabled, info, Level};
+use log::{error, info, LevelFilter, SetLoggerError};
 use bollard::container::ListContainersOptions;
 use bollard::Docker;
+use log4rs::{append::{file::FileAppender, console::{ConsoleAppender}}, encode::pattern::PatternEncoder, init_config, Config, config::{Appender, Root, Logger}};
 use tauri::{Manager};
 use std::default::Default;
+use dotenvy::dotenv;
 
 mod container;
 
+/*
+  Wait until the window is ready
+*/
 #[tauri::command(async)]
 async fn app_ready(app_handle: tauri::AppHandle) {
 	let window = app_handle.get_window("main").unwrap();
@@ -18,41 +23,75 @@ async fn app_ready(app_handle: tauri::AppHandle) {
 	window.show().unwrap();
 }
 
+/*
+  Start log4rs
+*/
+fn init_logging() -> Result<(), SetLoggerError> {
+  let logfile_path = "logs/outputs.log";
+  let logfile_line_pattern = "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {f}:{L} — {m}{n}";
+
+  let stdout = ConsoleAppender::builder().build();
+  let logfile = FileAppender::builder()
+      .append(false)
+      .encoder(Box::new(PatternEncoder::new(logfile_line_pattern)))
+      .build(logfile_path)
+      .unwrap();
+
+  let config = Config::builder()
+      .appender(Appender::builder().build("consoleAppender", Box::new(stdout)))
+      .appender(Appender::builder().build("containerAppender", Box::new(logfile)))
+      .logger(Logger::builder()
+            .appender("containerAppender")
+            .additive(true)
+            .build("app", LevelFilter::Info))
+      .build(Root::builder().appender("consoleAppender").build(LevelFilter::Debug))
+      .unwrap();
+
+  let _handle = init_config(config);
+  let _result = match _handle
+  {
+    Ok(_result) => { 
+      info!("Logger started") 
+    }
+    Err(error) => { 
+      error!("Logger could not be started: {}", error) 
+    }
+  };
+
+  Ok(())
+}
 
 #[tokio::main]
 async fn main() {
-  env_logger::init();
+  // Load .env file variables
+  dotenv().ok();
 
-  // TODO Connect with Docker Linux daemon using TCP
-  let docker_lin = Docker::connect_with_socket_defaults().unwrap();
-  // let docker_win = Docker::connect_with_socket_defaults().unwrap; //  TODO Connect with Docker Windows daemon
+  // Initialize logger
+  let _log_result = init_logging();
+  let _content = match _log_result
+  {
+    Ok(()) => { 
+      info!("Logger initialized successfuly") 
+    }
+    Err(error) => { 
+      error!("Logger failed to start: {:?}", error)
+    }
+  };
 
   tauri::Builder::default()
     .setup(|app| {
       let _app = app.handle();
-      
-      /*
-        4 different threads:
-          - Events for Linux containers
-          - Events for Windows containers
-          - Events for Linux images
-          - Events for Windows images
-      */
-      tokio::spawn(async move {        
-        let containers = &docker_lin.list_containers(Some(ListContainersOptions::<String> {
-          all: true,
-          ..Default::default()
-        })).await.unwrap();
 
-        for container in containers {
-          println!("-> {:?}", container);
-        }
-        
-      });
-
+      #[cfg(debug_assertions)] // Only include this code on debug builds
+      {
+        let window = app.get_window("main").unwrap();
+        window.open_devtools();
+      }
+    
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
+      container::list_containers,
       container::start_container,
       container::stop_container,
       container::restart_container,

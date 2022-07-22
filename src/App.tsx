@@ -1,25 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { invoke } from '@tauri-apps/api/tauri'
 
 function App() {
+  const [fieldValue, setFieldValue] = useState('');
+  const [portValue, setPortValue] = useState('');
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <button type="button" onClick={()=>StartContainer()}> Start Container </button>
+        <input value={fieldValue} onChange={(event) => setFieldValue(event.target.value)}></input>
+        <input value={portValue} onChange={(event) => setPortValue(event.target.value)}></input>
+        <button type="button" onClick={()=>ListContainers()}> List Containers </button>
+        <button type="button" onClick={()=>StartContainer(fieldValue)}> Start Container </button>
         <button type="button" onClick={()=>StopContainer()}> Stop Container </button>
         <button type="button" onClick={()=>RestartContainer()}> Restart Container </button>
         <button type="button" onClick={()=>RemoveContainer()}> Remove Container </button>
@@ -30,8 +23,11 @@ function App() {
   );
 }
 
-function StartContainer() {
-  invoke('start_container');
+function ListContainers() {
+  invoke('list_containers');
+}
+function StartContainer(name: string) {
+  invoke('start_container', { name });
 }
 
 function StopContainer() {

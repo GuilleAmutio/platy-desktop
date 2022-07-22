@@ -1,21 +1,53 @@
-use bollard::{container::{StartContainerOptions, StopContainerOptions, RestartContainerOptions, RemoveContainerOptions, InspectContainerOptions}, Docker, exec::{CreateExecOptions, StartExecOptions}};
-use futures::TryFutureExt;
+use bollard::{container::{StartContainerOptions, StopContainerOptions, RestartContainerOptions, RemoveContainerOptions, InspectContainerOptions, ListContainersOptions}, Docker, exec::{CreateExecOptions, StartExecOptions}};
+use log::{warn, error, info, debug};
+use webbrowser::open;
 
-use std::default::Default;
-use std::fmt::Debug;
+use std::{default::Default};
 
 fn print_type_of<T>(_: &T) {
   println!("{}", std::any::type_name::<T>());
 }
 
+/*
+  List all containers with their configuration. Frontend is the responsible to parse the information retrieve by this command
+*/
 #[tauri::command(async)]
-pub async fn start_container() {
+pub async fn list_containers() -> Result<(), ()> {
   let docker_lin = Docker::connect_with_socket_defaults().unwrap();
 
-  let response = docker_lin.start_container("nginx", None::<StartContainerOptions<String>>);
+  let list_container_options = ListContainersOptions::<String> {
+    all:true,
+    ..Default::default()
+  };
 
-  print_type_of(&response);
-  println!("-> {:?}", response.await.unwrap());
+  let result = docker_lin.list_containers(Some(list_container_options)).await;
+  let _content = match result {
+    Ok(_content) => { 
+      info!("{:?}", _content);
+    },
+    Err(error) => { 
+      error!("{}", error); 
+    }
+  };
+  
+  Ok(())
+}
+
+#[tauri::command(async)]
+pub async fn start_container(name: &str) -> Result<(), ()> {
+  let docker_lin = Docker::connect_with_socket_defaults().unwrap();
+
+  let result = docker_lin.start_container(name, None::<StartContainerOptions<String>>).await;
+  let _content = match result {
+    Ok(()) => { 
+      info!("Container {} started", name);
+    },
+    Err(error) => { 
+      error!("{}", error); 
+    }
+  };
+  
+  Ok(())
 }
 
 #[tauri::command(async)]
@@ -54,15 +86,20 @@ pub async fn open_in_browser() {
 
   let response = docker_lin.inspect_container("nginx", Some(InspectContainerOptions{ size: false }));
 
-  print_type_of(&response);
-  let putamierda1 = response.await.unwrap();
-  let putamierda2 = putamierda1.host_config.unwrap();
-  let putamierda3 = putamierda2.port_bindings.as_ref().unwrap();
-  let putamierda4 = putamierda3.get("80/tcp").unwrap();
-  let putamierda5 = putamierda4;
+  let host_ports = response.await.unwrap().host_config.unwrap().port_bindings.unwrap();
+  let port_binding = host_ports.get("80/tcp").unwrap();
+  let port_browser = &port_binding.iter().flatten().collect::<Vec<_>>()[0].host_port.as_ref().unwrap().to_string();
+
+  let mut url = "http://localhost:".to_string();
   
-  print_type_of(&putamierda5);
-  println!("-> {:?}", putamierda4);
+  url.push_str(port_browser);
+  
+  let url2 = &url[..];
+  if open(url2).is_ok(){
+    print!("Opened");
+  }
+  println!("-> {:?}", port_browser);
+  println!("-> {:?}", url);
 }
 
 #[tauri::command(async)]
